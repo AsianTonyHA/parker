@@ -90,14 +90,13 @@ const el = function(id) {
 
 let name = null;
 let score = 0n;
-let streak = 0;
-let best = 0;
+let best = 0n;
 let runId = null;
 let myRank = null;
 let boardRows = [];
 const flashTimers = {};
 let chance = 50;
-let level = 0;
+let level = 0n;
 let coins = 0n;
 let saving = false;
 const pending = {};
@@ -147,15 +146,21 @@ function fmt(n) {
 
 }
 
-function perClick() {
+function capScore(n) {
 
-  return 5n ** BigInt(level);
+  return n > 2147483647n ? 2147483647 : Number(n);
 
 }
 
-function costAt(l) {
+function perClick() {
 
-  return 3n * 5n ** BigInt(l);
+  return level + 1n;
+
+}
+
+function costAt() {
+
+  return 3n;
 
 }
 
@@ -163,7 +168,7 @@ function saveUpgrades() {
 
   try {
 
-    localStorage.setItem("lor_save_" + name, JSON.stringify({ level: level, coins: coins.toString() }));
+    localStorage.setItem("lor_save_" + name, JSON.stringify({ level: level.toString(), coins: coins.toString() }));
 
   } catch (e) {}
 
@@ -171,7 +176,7 @@ function saveUpgrades() {
 
 function loadUpgrades() {
 
-  level = 0;
+  level = 0n;
   coins = 0n;
 
   try {
@@ -180,7 +185,7 @@ function loadUpgrades() {
 
     if (data) {
 
-      level = Number(data.level) || 0;
+      level = BigInt(data.level || "0");
       coins = BigInt(data.coins || "0");
 
     }
@@ -191,17 +196,19 @@ function loadUpgrades() {
 
 function buy(max) {
 
-  let bought = 0;
+  const cost = costAt();
+  let bought = coins / cost;
 
-  while (coins >= costAt(level) && (max || bought < 1)) {
+  if (!max && bought > 1n) {
 
-    coins = coins - costAt(level);
-    level = level + 1;
-    bought = bought + 1;
+    bought = 1n;
 
   }
 
-  if (bought > 0) {
+  if (bought > 0n) {
+
+    coins = coins - bought * cost;
+    level = level + bought;
 
     saveUpgrades();
     showScores();
@@ -212,16 +219,16 @@ function buy(max) {
 
 function showScores() {
 
-  const cost = costAt(level);
+  const cost = costAt();
 
-  el("lvl").textContent = "upgrade lv " + fmt(BigInt(level));
+  el("lvl").textContent = "upgrade lv " + fmt(level);
   el("perTxt").textContent = "+" + fmt(perClick()) + " per click";
   el("coins").textContent = "coins: " + fmt(coins);
   el("buy").textContent = "upgrade (" + fmt(cost) + ")";
   el("buy").disabled = coins < cost;
   el("buyMax").disabled = coins < cost;
   el("score").textContent = fmt(score);
-  el("bestTxt").textContent = "best streak: " + best + (myRank ? " \u00b7 rank #" + myRank : "");
+  el("bestTxt").textContent = "best streak: " + fmt(best) + (myRank ? " \u00b7 rank #" + myRank : "");
 
 }
 
@@ -272,7 +279,7 @@ function renderBoard() {
   if (name && myRank && myRank > 10) {
 
     addRow(body, "…", "", "", "mute");
-    addRow(body, myRank, name + " (your best)", best, "me");
+    addRow(body, myRank, name + " (your best)", fmt(best), "me");
 
   }
 
@@ -290,9 +297,9 @@ async function refresh() {
 
     boardRows = await api("runs?select=name,score&order=score.desc,created_at.asc&limit=10");
 
-    if (name && best > 0) {
+    if (name && best > 0n) {
 
-      myRank = await api("rpc/get_rank", { p_score: best });
+      myRank = await api("rpc/get_rank", { p_score: capScore(best) });
 
     }
 
@@ -369,8 +376,7 @@ async function login(raw) {
 
   name = clean;
   score = 0n;
-  streak = 0;
-  best = 0;
+  best = 0n;
   runId = null;
   myRank = null;
   loadUpgrades();
@@ -383,7 +389,7 @@ async function login(raw) {
 
       if (rows.length > 0) {
 
-        best = rows[0].score;
+        best = BigInt(rows[0].score);
 
       }
 
@@ -443,7 +449,6 @@ function pick(side) {
 
     score = score + perClick();
     coins = coins + perClick();
-    streak = streak + 1;
     saveUpgrades();
 
     if (!runId) {
@@ -452,19 +457,18 @@ function pick(side) {
 
     }
 
-    if (streak > best) {
+    if (score > best) {
 
-      best = streak;
+      best = score;
 
     }
 
-    pending[runId] = { name: name, score: streak };
+    pending[runId] = { name: name, score: capScore(score) };
     flush();
 
   } else {
 
     score = 0n;
-    streak = 0;
     runId = null;
 
   }
