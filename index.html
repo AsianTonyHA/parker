@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>left or right</title>
+<style>
+:root { box-sizing: border-box; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); --bg: #f4f1ea; --card: #fff; --ink: #1d1d1b; --mute: #77736a; --line: #e2ddd0; --acc: #2d6a4f; --bad: #b5443a; }
+@media (prefers-color-scheme: dark) { :root { --bg: #151513; --card: #201f1c; --ink: #f1ede2; --mute: #99948a; --line: #34322d; --acc: #74c69d; --bad: #e07a6f; } }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: "Trebuchet MS", system-ui, sans-serif; }
+main { max-width: 520px; margin: 0 auto; padding: 24px 16px 40px; }
+h1 { font-size: 1.6rem; margin: 0 0 4px; }
+.sub { color: var(--mute); margin: 0 0 20px; font-size: .9rem; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 18px; margin-bottom: 16px; }
+input { width: 100%; padding: 12px; font-size: 1rem; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); margin-bottom: 10px; }
+button { font: inherit; cursor: pointer; border: 0; border-radius: 12px; }
+.go { width: 100%; padding: 12px; background: var(--acc); color: var(--bg); font-weight: 700; }
+.row { display: flex; gap: 12px; }
+.pick { flex: 1; padding: 44px 0; font-size: 1.3rem; font-weight: 700; background: var(--bg); color: var(--ink); border: 2px solid var(--line); transition: transform .1s; }
+.pick:active { transform: scale(.97); }
+.pick.win { border-color: var(--acc); background: var(--acc); color: var(--bg); }
+.pick.lose { border-color: var(--bad); background: var(--bad); color: var(--bg); }
+.stats { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 14px; }
+.score { font-size: 2.6rem; font-weight: 800; line-height: 1; }
+.mute { color: var(--mute); font-size: .85rem; }
+.msg { min-height: 1.4em; text-align: center; margin-top: 12px; font-weight: 700; }
+table { width: 100%; border-collapse: collapse; }
+td { padding: 8px 4px; border-bottom: 1px solid var(--line); }
+td:last-child { text-align: right; font-weight: 700; }
+tr.me td { color: var(--acc); }
+.link { background: none; color: var(--mute); text-decoration: underline; padding: 0; font-size: .85rem; }
+.chance { margin-bottom: 14px; }
+input[type=range] { padding: 0; margin: 0; border: 0; background: none; accent-color: var(--acc); }
+.upg { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line); }
+.go:disabled { opacity: .4; cursor: not-allowed; }
+.go.alt { background: var(--bg); color: var(--ink); border: 2px solid var(--line); }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main>
+<h1>left or right</h1>
+<p class="sub" id="sub">no skill. how lucky are you?</p>
+
+<div class="card" id="login">
+<input id="nameIn" placeholder="pick a username" maxlength="16" autocomplete="off" autocapitalize="off">
+<button class="go" id="goBtn">play</button>
+<div class="msg mute" id="loginMsg"></div>
+</div>
+
+<div class="card" id="game" hidden>
+<div class="stats">
+<div><div class="mute" id="who"></div><div class="score" id="score">0</div><div class="mute" id="bestTxt"></div></div>
+<button class="link" id="outBtn">switch user</button>
+</div>
+<div class="chance">
+<div class="stats" style="margin-bottom:6px"><span class="mute">chance of being right</span><strong id="chanceVal">50%</strong></div>
+<input type="range" id="chance" min="1" max="100" step="1" value="50">
+</div>
+<div class="row">
+<button class="pick" id="left">LEFT</button>
+<button class="pick" id="right">RIGHT</button>
+</div>
+<div class="msg" id="msg"></div>
+<div class="upg">
+<div class="stats" style="margin-bottom:10px"><span><strong id="lvl"></strong> <span class="mute" id="perTxt"></span></span><span class="mute" id="coins"></span></div>
+<div class="row"><button class="go" id="buy"></button><button class="go alt" id="buyMax">buy max</button></div>
+</div>
+</div>
+
+<div class="card">
+<div class="stats"><strong>global leaderboard <span class="mute">(every streak)</span></strong><span class="mute" id="lbNote"></span></div>
+<table><tbody id="lb"></tbody></table>
+</div>
+</main>
+
+<script>
+// paste these two from supabase (project settings > api keys). the publishable key is safe to put here
+const SUPABASE_URL = "https://yevwkbstwyjxbclftrpq.supabase.co";
+const SUPABASE_KEY = "sb_publishable_4kbVNqGod8IKhqskyZ3DiQ_wgU7YsxE";
+
+const online = !SUPABASE_URL.includes("PASTE") && !SUPABASE_KEY.includes("PASTE");
+
+const el = function(id) {
+
+  return document.getElementById(id);
+
+};
+
+let name = null;
+let score = 0;
+let best = 0;
+let runId = null;
+let myRank = null;
+let boardRows = [];
+const flashTimers = {};
+let chance = 50;
+let level = 0;
+let coins = 0;
+let saving = false;
+const pending = {};
+
+async function api(path, body) {
+
+  const options = {
+    headers: { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY, "Content-Type": "application/json" }
+  };
+
+  if (body) {
+
+    options.method = "POST";
+    options.body = JSON.stringify(body);
+
+  }
+
+  const res = await fetch(SUPABASE_URL + "/rest/v1/" + path, options);
+
+  if (!res.ok) {
+
+    throw new Error("http " + res.status);
+
+  }
+
+  return res.json();
+
+}
+
+function cleanName(raw) {
+
+  return raw.toLowerCase().replace(/[^a-z0-9_-]/g, "");
+
+}
+
+function fmt(n) {
+
+  return n.toLocaleString("en-US", { maximumFractionDigits: 0 });
+
+}
+
+function perClick() {
+
+  return level + 1;
+
+}
+
+function costAt(l) {
+
+  return Math.floor(10 * Math.pow(1.4, l));
+
+}
+
+function saveUpgrades() {
+
+  try {
+
+    localStorage.setItem("lor_save_" + name, JSON.stringify({ level: level, coins: coins }));
+
+  } catch (e) {}
+
+}
+
+function loadUpgrades() {
+
+  level = 0;
+  coins = 0;
+
+  try {
+
+    const data = JSON.parse(localStorage.getItem("lor_save_" + name));
+
+    if (data) {
+
+      level = data.level || 0;
+      coins = data.coins || 0;
+
+    }
+
+  } catch (e) {}
+
+}
+
+function buy(max) {
+
+  let bought = 0;
+
+  while (coins >= costAt(level) && (max || bought < 1)) {
+
+    coins = coins - costAt(level);
+    level = level + 1;
+    bought = bought + 1;
+
+  }
+
+  if (bought > 0) {
+
+    saveUpgrades();
+    showScores();
+
+  }
+
+}
+
+function showScores() {
+
+  el("lvl").textContent = "upgrade lv " + fmt(level);
+  el("perTxt").textContent = "+" + fmt(perClick()) + " per click";
+  el("coins").textContent = "coins: " + fmt(coins);
+  el("buy").textContent = "upgrade (" + fmt(costAt(level)) + ")";
+  el("buy").disabled = coins < costAt(level);
+  el("buyMax").disabled = coins < costAt(level);
+  el("score").textContent = fmt(score);
+  el("bestTxt").textContent = "best: " + best + (myRank ? " · rank #" + myRank : "");
+
+}
+
+function addRow(body, a, b, c, cls) {
+
+  const tr = document.createElement("tr");
+
+  tr.className = cls || "";
+
+  [a, b, c].forEach(function(text) {
+
+    const td = document.createElement("td");
+
+    td.textContent = text;
+    tr.appendChild(td);
+
+  });
+
+  body.appendChild(tr);
+
+}
+
+function renderBoard() {
+
+  const body = el("lb");
+  body.textContent = "";
+
+  if (!online) {
+
+    body.innerHTML = "<tr><td class='mute'>leaderboard not set up yet (see the top of the script)</td></tr>";
+    return;
+
+  }
+
+  if (boardRows.length === 0) {
+
+    body.innerHTML = "<tr><td class='mute'>no streaks yet, be first</td></tr>";
+    return;
+
+  }
+
+  for (let l = 0; l < boardRows.length; l++) {
+
+    addRow(body, l + 1, boardRows[l].name, boardRows[l].score, boardRows[l].name === name ? "me" : "");
+
+  }
+
+  if (name && myRank && myRank > 10) {
+
+    addRow(body, "…", "", "", "mute");
+    addRow(body, myRank, name + " (your best)", best, "me");
+
+  }
+
+}
+
+async function refresh() {
+
+  if (!online) {
+
+    return;
+
+  }
+
+  try {
+
+    boardRows = await api("runs?select=name,score&order=score.desc,created_at.asc&limit=10");
+
+    if (name && best > 0) {
+
+      myRank = await api("rpc/get_rank", { p_score: best });
+
+    }
+
+    el("lbNote").textContent = "";
+    showScores();
+    renderBoard();
+
+  } catch (e) {
+
+    el("lbNote").textContent = "can't reach server";
+
+  }
+
+}
+
+async function flush() {
+
+  if (saving || !online) {
+
+    return;
+
+  }
+
+  saving = true;
+
+  let keys = Object.keys(pending);
+
+  while (keys.length > 0) {
+
+    for (let l = 0; l < keys.length; l++) {
+
+      const id = keys[l];
+      const data = pending[id];
+
+      delete pending[id];
+
+      try {
+
+        const saved = await api("rpc/save_run", { p_id: id, p_name: data.name, p_score: data.score });
+
+        if (!saved) {
+
+          el("msg").textContent = "leaderboard is full, this streak wasn't saved";
+
+        }
+
+      } catch (e) {
+
+        el("msg").textContent = "couldn't save that streak";
+
+      }
+
+    }
+
+    keys = Object.keys(pending);
+
+  }
+
+  saving = false;
+  refresh();
+
+}
+
+async function login(raw) {
+
+  const clean = cleanName(raw);
+
+  if (clean.length < 3) {
+
+    el("loginMsg").textContent = "3-16 characters, letters, numbers, _ or -";
+    return;
+
+  }
+
+  name = clean;
+  score = 0;
+  best = 0;
+  runId = null;
+  myRank = null;
+  loadUpgrades();
+
+  if (online) {
+
+    try {
+
+      const rows = await api("runs?select=score&name=eq." + name + "&order=score.desc&limit=1");
+
+      if (rows.length > 0) {
+
+        best = rows[0].score;
+
+      }
+
+    } catch (e) {
+
+      el("loginMsg").textContent = "couldn't reach the server, playing offline";
+
+    }
+
+  }
+
+  try {
+
+    localStorage.setItem("lor_name", name);
+
+  } catch (e) {}
+
+  el("who").textContent = name;
+  showScores();
+  el("login").hidden = true;
+  el("game").hidden = false;
+  refresh();
+
+}
+
+function logout() {
+
+  name = null;
+  myRank = null;
+
+  try {
+
+    localStorage.removeItem("lor_name");
+
+  } catch (e) {}
+
+  el("game").hidden = true;
+  el("login").hidden = false;
+  el("msg").textContent = "";
+  renderBoard();
+
+}
+
+function pick(side) {
+
+  if (!name) {
+
+    return;
+
+  }
+
+  const right = Math.random() * 100 < chance;
+  const other = side === "left" ? "right" : "left";
+  const answer = right ? side : other;
+
+  if (right) {
+
+    score = score + perClick();
+    coins = coins + perClick();
+    saveUpgrades();
+
+    if (!runId) {
+
+      runId = name + "_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+
+    }
+
+    if (score > best) {
+
+      best = score;
+
+    }
+
+    pending[runId] = { name: name, score: score };
+    flush();
+
+  } else {
+
+    score = 0;
+    runId = null;
+
+  }
+
+  showScores();
+  el(side).classList.remove("win", "lose");
+  el(side).classList.add(right ? "win" : "lose");
+  el("msg").textContent = right ? "correct! +" + fmt(perClick()) : "nope, it was " + answer + ". back to 0";
+
+  clearTimeout(flashTimers[side]);
+  flashTimers[side] = setTimeout(function() {
+
+    el(side).classList.remove("win", "lose");
+
+  }, 150);
+
+}
+
+function init() {
+
+  el("goBtn").onclick = function() {
+
+    login(el("nameIn").value);
+
+  };
+
+  el("nameIn").onkeydown = function(e) {
+
+    if (e.key === "Enter") {
+
+      login(el("nameIn").value);
+
+    }
+
+  };
+
+  el("chance").oninput = function() {
+
+    chance = Number(el("chance").value);
+    el("chanceVal").textContent = chance + "%";
+
+  };
+
+  el("buy").onclick = function() {
+
+    buy(false);
+
+  };
+
+  el("buyMax").onclick = function() {
+
+    buy(true);
+
+  };
+
+  el("outBtn").onclick = logout;
+  el("left").onclick = function() {
+
+    pick("left");
+
+  };
+  el("right").onclick = function() {
+
+    pick("right");
+
+  };
+
+  renderBoard();
+  refresh();
+
+  // no live push like before, so the board re-checks every few seconds
+  setInterval(function() {
+
+    if (!document.hidden) {
+
+      refresh();
+
+    }
+
+  }, 5000);
+
+  let saved = null;
+
+  try {
+
+    saved = localStorage.getItem("lor_name");
+
+  } catch (e) {}
+
+  if (saved) {
+
+    login(saved);
+
+  }
+
+}
+
+init();
+</script>
+</body>
+</html>
