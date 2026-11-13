@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Social media and teen mental health | Southern Nevada</title>
+<meta name="description" content="What the research says about social media and teen mental health, signs a friend may need support, and where to get help in Southern Nevada.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#14315c; --sky:#dcebf7; --leaf:#2f7d6b; --sun:#f2b84b; --paper:#fbfcfd; --mist:#eef5fa; --text:#23364f;
+  --head:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+  --body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--text);font:1.0625rem/1.65 var(--body)}
+h1,h2,h3{font-family:var(--head);color:var(--ink);line-height:1.1;margin:0 0 .5em}
+h1{font-size:clamp(2.4rem,7vw,4.5rem);font-weight:800;letter-spacing:-.02em}
+h2{font-size:clamp(1.7rem,4vw,2.4rem);font-weight:700}
+h3{font-size:1.2rem;font-weight:700;margin-bottom:.3em}
+p{margin:0 0 1em;max-width:64ch}
+a{color:var(--ink)}
+:focus-visible{outline:3px solid var(--sun);outline-offset:3px;border-radius:4px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 1.25rem}
+.skip{position:absolute;left:-999px;top:0;background:var(--ink);color:#fff;padding:.6rem 1rem;z-index:20}
+.skip:focus{left:0}
+section{padding:4rem 0}
+
+/* hero */
+.hero{position:relative;color:#fff;background:
+  linear-gradient(180deg,rgba(20,49,92,.72) 0%,rgba(20,49,92,.45) 55%,rgba(20,49,92,.7) 100%),
+  url("https://images.unsplash.com/photo-1504386106331-3e4e71712b38?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMDE3MjIwfDB8MXxzZWFyY2h8M3x8c3VucmlzZSUyMG92ZXIlMjBoaWxsc3xlbnwxfDB8fHwxNzk0NTI2ODU5fDI&ixlib=rb-4.1.0&q=80&w=1600") center/cover #1c3a66}
+.hero header{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:1rem 1.25rem;max-width:1080px;margin:0 auto}
+.brand{font-family:var(--head);font-weight:800;color:#fff;text-decoration:none;font-size:1.1rem}
+.hero nav a{margin-left:1.1rem;color:#fff;text-decoration:none;font-weight:700;font-size:.95rem}
+.hero nav a:hover{text-decoration:underline}
+.hero .copy{max-width:1080px;margin:0 auto;padding:5rem 1.25rem 6rem}
+.hero h1{color:#fff;max-width:14ch;animation:up .9s cubic-bezier(.2,.7,.2,1) both}
+.hero p.lead{font-size:1.25rem;max-width:46ch;animation:up .9s .15s cubic-bezier(.2,.7,.2,1) both}
+.btns{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:1.5rem;animation:up .9s .3s cubic-bezier(.2,.7,.2,1) both}
+.btn{display:inline-block;padding:.8rem 1.4rem;border-radius:999px;font-weight:700;text-decoration:none;border:2px solid #fff}
+.btn.main{background:var(--sun);border-color:var(--sun);color:#14315c}
+.btn.main:hover{background:#ffc965}
+.btn.alt{color:#fff}
+.btn.alt:hover{background:rgba(255,255,255,.15)}
+@keyframes up{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+
+/* facts */
+.facts{display:grid;gap:2.5rem 3rem;grid-template-columns:1fr;margin-top:2rem}
+@media (min-width:760px){.facts{grid-template-columns:repeat(2,1fr)}}
+.fact strong{font-family:var(--head);font-size:2.6rem;color:var(--ink);display:block;line-height:1}
+.fact span.t{display:block;margin:.4rem 0 .9rem;max-width:40ch}
+.meter{height:14px;border-radius:7px;background:#d3e0ec;overflow:hidden;max-width:320px}
+.meter i{display:block;height:100%;background:var(--leaf)}
+.cap{font-size:.85rem;opacity:.8;margin-top:.3rem}
+.duo .meter{margin-bottom:.35rem}
+.duo .meter.hi i{background:var(--sun)}
+.dots{display:flex;gap:6px}
+.dot{width:22px;height:22px;border-radius:50%;background:#c5d6e6}
+.dot.on{background:var(--leaf)}
+.src{font-size:.9rem;opacity:.85;margin-top:2.25rem}
+
+/* research */
+.research{background:var(--mist)}
+.grid2{display:grid;gap:2.25rem;grid-template-columns:1fr}
+@media (min-width:860px){.grid2{grid-template-columns:1.1fr 1fr;align-items:center}.grid2.flip{grid-template-columns:1fr 1.1fr}}
+.photo{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:20px;display:block}
+.cols{display:grid;gap:1.5rem;grid-template-columns:1fr;margin-top:1.5rem}
+@media (min-width:600px){.cols{grid-template-columns:1fr 1fr}}
+.cols ul{margin:0;padding-left:1.1rem}
+.cols li{margin-bottom:.5rem}
+
+/* signs */
+.signs ul{list-style:none;margin:1.25rem 0 0;padding:0;display:grid;gap:0 3rem;grid-template-columns:1fr}
+@media (min-width:760px){.signs ul{grid-template-columns:1fr 1fr}}
+.signs li{padding:.8rem 0 .8rem 2rem;border-bottom:1px solid #dbe5ee;position:relative}
+.signs li::before{content:"";position:absolute;left:0;top:1.15rem;width:1rem;height:1rem;border-radius:50%;background:var(--sun)}
+.note{font-size:.95rem;border-left:4px solid var(--leaf);padding-left:1rem;margin-top:1.75rem}
+
+/* help */
+.steps{counter-reset:s;list-style:none;margin:0;padding:0}
+.steps li{counter-increment:s;position:relative;padding:0 0 1.4rem 3.2rem}
+.steps li::before{content:counter(s);position:absolute;left:0;top:0;width:2.2rem;height:2.2rem;border-radius:50%;background:var(--ink);color:#fff;font-family:var(--head);font-weight:800;display:grid;place-items:center}
+
+/* support */
+.crisis{background:var(--ink);color:#e8f0f8}
+.crisis h2{color:#fff}
+.nums{display:grid;gap:1.5rem;grid-template-columns:1fr;margin-top:1.5rem}
+@media (min-width:860px){.nums{grid-template-columns:repeat(3,1fr)}}
+.num{border:2px solid #4a6b97;border-radius:18px;padding:1.4rem}
+.num h3{color:#fff}
+.big{font-family:var(--head);font-weight:800;font-size:1.9rem;color:var(--sun);line-height:1.1;display:block;margin:.3rem 0 .6rem}
+.crisis a{color:#fff}
+
+footer{padding:2.5rem 0 3rem;font-size:.92rem}
+footer p{max-width:75ch}
+@media (prefers-reduced-motion:reduce){.hero h1,.hero p.lead,.btns{animation:none}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="hero" id="top">
+  <header>
+    <a class="brand" href="#top">Check in</a>
+    <nav aria-label="Main">
+      <a href="#facts">Numbers</a>
+      <a href="#research">Research</a>
+      <a href="#signs">Signs</a>
+      <a href="#help">Help a friend</a>
+      <a href="#support">Get support</a>
+    </nav>
+  </header>
+  <div class="copy">
+    <h1>Social media and teen mental health</h1>
+    <p class="lead">Teens spend about 3.5 hours a day on social media. This site covers what the research says about that, the signs a friend might be struggling, and where to get help in Southern Nevada.</p>
+    <div class="btns">
+      <a class="btn main" href="#support">Get help now</a>
+      <a class="btn alt" href="#research">Read the research</a>
+    </div>
+  </div>
+</div>
+
+<main id="main">
+<section id="facts">
+  <div class="wrap">
+    <h2>The numbers</h2>
+    <p>These figures come from the U.S. Surgeon General and NAMI.</p>
+    <div class="facts">
+      <div class="fact">
+        <strong>3.5 hours</strong>
+        <span class="t">The average time teens spend on social media each day.</span>
+        <div class="meter" role="img" aria-label="3.5 hours out of a 24 hour day"><i style="width:14.6%"></i></div>
+        <div class="cap">3.5 of 24 hours</div>
+      </div>
+      <div class="fact duo">
+        <strong>2x</strong>
+        <span class="t">The risk of depression and anxiety symptoms for teens who spend more than 3 hours a day on social media.</span>
+        <div class="meter" role="img" aria-label="Baseline risk for teens at 3 hours or less"><i style="width:50%"></i></div>
+        <div class="cap">3 hours or less: baseline</div>
+        <div class="meter hi" role="img" aria-label="Double the risk for teens over 3 hours" style="margin-top:.7rem"><i style="width:100%"></i></div>
+        <div class="cap">More than 3 hours: double</div>
+      </div>
+      <div class="fact">
+        <strong>46%</strong>
+        <span class="t">of teens ages 13 to 17 say social media makes them feel worse about their body image.</span>
+        <div class="meter" role="img" aria-label="46 percent"><i style="width:46%"></i></div>
+      </div>
+      <div class="fact">
+        <strong>1 in 6</strong>
+        <span class="t">U.S. youth ages 6 to 17 has a mental health condition each year.</span>
+        <div class="dots" role="img" aria-label="1 out of 6 people"><span class="dot on"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+      </div>
+    </div>
+    <p class="src">Sources: <a href="https://www.hhs.gov/surgeongeneral/priorities/youth-mental-health/social-media">U.S. Surgeon General's Advisory on social media and youth mental health (2023)</a> and <a href="https://www.nami.org/about-mental-illness/mental-health-by-the-numbers/">NAMI, Mental health by the numbers</a>. Check both pages for the latest figures.</p>
+  </div>
+</section>
+
+<section class="research" id="research">
+  <div class="wrap grid2">
+    <div>
+      <h2>What the research says</h2>
+      <p>In 2023 the U.S. Surgeon General issued an advisory on social media and youth mental health. It found that teens who spend more than three hours a day on social media face double the risk of depression and anxiety symptoms. It also concluded there is not enough evidence to call social media safe for young people.</p>
+      <p>The advisory lists benefits too. The three-hour finding shows a link between heavy use and symptoms, and it does not prove that social media causes them. The effect varies from person to person.</p>
+      <div class="cols">
+        <div>
+          <h3>Risks the advisory points to</h3>
+          <ul>
+            <li>Heavy use is linked to double the risk of symptoms</li>
+            <li>46% of teens say it hurts how they feel about their bodies</li>
+            <li>Not enough evidence yet to call it safe</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Benefits the advisory lists</h3>
+          <ul>
+            <li>Community with people who share your identity or interests</li>
+            <li>Access to information</li>
+            <li>A place for self-expression</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <img class="photo" loading="lazy" alt="A young person lying in bed looking at a phone" src="https://images.unsplash.com/photo-1681483685538-a14966c8c379?crop=entropy&amp;cs=tinysrgb&amp;fit=max&amp;fm=jpg&amp;ixid=M3wxMDE3MjIwfDB8MXxzZWFyY2h8M3x8dGVlbmFnZXIlMjBsb29raW5nJTIwYXQlMjBwaG9uZXxlbnwxfDB8fHwxNzk0NTI2ODU2fDI&amp;ixlib=rb-4.1.0&amp;q=80&amp;w=1080">
+  </div>
+</section>
+
+<section class="signs" id="signs">
+  <div class="wrap">
+    <h2>Signs a friend (or you) may need support</h2>
+    <p>Everyone has bad days. Watch for changes that last or start to get in the way of school, friends, or sleep.</p>
+    <ul>
+      <li>Pulling away from friends, family, or things they used to enjoy</li>
+      <li>Big changes in sleep or appetite</li>
+      <li>Constant worry, fear, or feeling on edge</li>
+      <li>Feeling hopeless, empty, or worthless</li>
+      <li>Trouble focusing at school or work</li>
+      <li>Sudden mood swings or irritability</li>
+    </ul>
+    <p class="note">Only a trained professional can diagnose a condition. If you are worried about someone, reach out.</p>
+  </div>
+</section>
+
+<section id="help" style="background:var(--mist)">
+  <div class="wrap grid2 flip">
+    <img class="photo" loading="lazy" alt="Three friends talking outdoors on a sunny day" src="https://images.unsplash.com/photo-1761839257349-037aea1d94de?crop=entropy&amp;cs=tinysrgb&amp;fit=max&amp;fm=jpg&amp;ixid=M3wxMDE3MjIwfDB8MXxzZWFyY2h8M3x8ZnJpZW5kcyUyMHRhbGtpbmclMjBvdXRkb29yc3xlbnwxfDB8fHwxNzk0NDYyNjQ3fDI&amp;ixlib=rb-4.1.0&amp;q=80&amp;w=1080">
+    <div>
+      <h2>How to help a friend</h2>
+      <p>You don't need perfect words. Showing up counts.</p>
+      <ol class="steps">
+        <li><h3>Ask directly</h3>Try "I've noticed you seem down lately. How are you doing?" Then listen. You don't have to fix anything.</li>
+        <li><h3>Say you care</h3>Tell them you're not going anywhere. Skip the blame, the comparisons, and "just cheer up."</li>
+        <li><h3>Point to support</h3>Offer to help them find a counselor, a doctor, or the NAMI HelpLine. Going with them to the first appointment can make it easier.</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="crisis" id="support">
+  <div class="wrap">
+    <h2>Need to talk to someone?</h2>
+    <p>Free, confidential support is available. If you or someone else is in immediate danger, call 911.</p>
+    <div class="nums">
+      <div class="num">
+        <h3>988 Suicide and Crisis Lifeline</h3>
+        <span class="big">Call or text 988</span>
+        <p>For anyone in emotional distress or crisis, any time of day.</p>
+        <a href="https://988lifeline.org">988lifeline.org</a>
+      </div>
+      <div class="num">
+        <h3>NAMI HelpLine</h3>
+        <span class="big">1-800-950-6264</span>
+        <p>Information, resource referrals, and support. You can also text "HelpLine" to 62640. Check hours at <a href="https://www.nami.org/help">nami.org/help</a>.</p>
+      </div>
+      <div class="num">
+        <h3>NAMI Southern Nevada</h3>
+        <span class="big">Local chapter</span>
+        <p>NAMI Southern Nevada is the local chapter of the National Alliance on Mental Illness. Find your chapter, local programs, and resources at <a href="https://www.nami.org/">nami.org</a>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>A student project for A-Tech's PBL: Becoming an Influencer. The driving question is how we can use our digital influence to amplify a local organization's impact on a community issue.</p>
+    <p>This site is independent and is not affiliated with or endorsed by NAMI. It does not give medical advice. Confirm statistics and phone numbers on the sources linked above.</p>
+    <p>Photos on Unsplash by <a href="https://unsplash.com/@grin?utm_source=pbl_mental_health_site&amp;utm_medium=referral">Andrey Grinkevich</a>, <a href="https://unsplash.com/@sixteenmilesout?utm_source=pbl_mental_health_site&amp;utm_medium=referral">Sixteen Miles Out</a>, and <a href="https://unsplash.com/@landolakesinc?utm_source=pbl_mental_health_site&amp;utm_medium=referral">Land O'Lakes, Inc.</a> via <a href="https://unsplash.com/?utm_source=pbl_mental_health_site&amp;utm_medium=referral">Unsplash</a>.</p>
+  </div>
+</footer>
+</body>
+</html>
